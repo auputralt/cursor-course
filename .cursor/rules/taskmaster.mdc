@@ -9,10 +9,6 @@ alwaysApply: true
 - Never mark tasks as done without my permission. Always create a checklist for a human to verify your changes.
 - Keep tasks as small as possible, don't mix design with code.
 
-```
-cd /Users/shawnesquivel/cursor-course && cd npx task-master next
-```
-
 # Taskmaster Tool & Command Reference
 
 This document provides a detailed reference for interacting with Taskmaster, covering both the recommended MCP tools (for integrations like Cursor) and the corresponding `task-master` CLI commands (for direct user interaction or fallback).

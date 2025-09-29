@@ -1,0 +1,289 @@
+---
+globs: *.ts,*.tsx
+alwaysApply: false
+---
+# TypeScript Type Organization Guidelines
+
+## Core Principles
+
+- **Colocation First**: Define types as close as possible to their usage
+- **Global When Shared**: Use global types directory only for truly shared contracts
+- **Feature-Based**: Organize by feature/domain for large applications
+- **Avoid Global Pollution**: Minimize `.d.ts` files and global declarations
+
+## Type Organization Strategy
+
+### 1. Component-Level Types (Colocation)
+
+**For component-specific types:**
+- Define in the same file as the component for simple cases
+- Use sibling `types.ts` file for complex components
+- Keep prop and state types with their components
+
+```typescript
+// ✅ DO: Simple component with inline types
+interface ButtonProps {
+  variant: 'primary' | 'secondary';
+  size: 'sm' | 'md' | 'lg';
+  onClick: () => void;
+}
+
+export function Button({ variant, size, onClick }: ButtonProps) {
+  // component implementation
+}
+
+// ✅ DO: Complex component with separate types file
+// Button/Button.tsx
+import { ButtonProps, ButtonState } from './types';
+
+// Button/types.ts
+export interface ButtonProps {
+  variant: ButtonVariant;
+  size: ButtonSize;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+
+export interface ButtonState {
+  isLoading: boolean;
+  isPressed: boolean;
+}
+
+export type ButtonVariant = 'primary' | 'secondary' | 'danger';
+export type ButtonSize = 'sm' | 'md' | 'lg';
+```
+
+### 2. Feature-Based Types
+
+**For feature-specific types:**
+- Place in feature directory alongside components
+- Use descriptive naming: `{FeatureName}Types.ts` or `types.ts`
+- Only move to global when reused across features
+
+```
+src/
+  features/
+    auth/
+      types.ts          # Auth-specific types
+      AuthForm.tsx
+      LoginPage.tsx
+    dashboard/
+      types.ts          # Dashboard-specific types
+      Dashboard.tsx
+      Widgets/
+        types.ts        # Widget-specific types
+        ChartWidget.tsx
+```
+
+### 3. Global Types Directory
+
+**For truly shared types:**
+- Place in `src/types/` directory
+- Segment by domain: `api.ts`, `models.ts`, `common.ts`
+- Use barrel file (`index.ts`) for clean imports
+
+```typescript
+// src/types/api.ts
+export interface ApiResponse<T> {
+  data: T;
+  status: number;
+  message: string;
+}
+
+export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+}
+
+// src/types/models.ts
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: Date;
+}
+
+export interface Product {
+  id: string;
+  title: string;
+  price: number;
+  category: ProductCategory;
+}
+
+// src/types/index.ts
+export * from './api';
+export * from './models';
+export * from './common';
+```
+
+## File Structure Examples
+
+### Small to Medium Projects
+```
+src/
+  components/
+    Button/
+      Button.tsx
+      types.ts
+    Modal/
+      Modal.tsx
+      types.ts
+  types/
+    api.ts
+    models.ts
+    index.ts
+  utils/
+  hooks/
+```
+
+### Large/Feature-Based Projects
+```
+src/
+  components/
+    ui/                    # Shared UI components
+      Button/
+        Button.tsx
+        types.ts
+  features/
+    auth/
+      types.ts
+      components/
+        LoginForm.tsx
+        RegisterForm.tsx
+    dashboard/
+      types.ts
+      components/
+        Dashboard.tsx
+        Widgets/
+          types.ts
+          ChartWidget.tsx
+  types/
+    api.ts
+    models.ts
+    common.ts
+    index.ts
+  utils/
+  hooks/
+```
+
+## Naming Conventions
+
+### Type Files
+- Use `types.ts` for general type files
+- Use `{FeatureName}Types.ts` for feature-specific types
+- Use camelCase: `userProfile.types.ts` (not `UserProfile.types.ts`)
+
+### Type Names
+- Use PascalCase for interfaces and types
+- Use descriptive suffixes: `Props`, `State`, `Config`, `Response`
+- Use generic naming: `T`, `K`, `V` for generic types
+
+```typescript
+// ✅ DO: Good naming
+interface UserProfileProps {
+  user: User;
+  onUpdate: (user: User) => void;
+}
+
+type ApiResponse<T> = {
+  data: T;
+  status: 'success' | 'error';
+};
+
+// ❌ DON'T: Poor naming
+interface props {
+  user: any;
+  callback: Function;
+}
+```
+
+## Import/Export Patterns
+
+### Barrel Exports
+```typescript
+// src/types/index.ts
+export * from './api';
+export * from './models';
+export * from './common';
+
+// Usage
+import { User, ApiResponse } from '@/types';
+```
+
+### Selective Imports
+```typescript
+// For large type files, use selective imports
+import type { User, UserProfile } from '@/types/models';
+import type { ApiResponse } from '@/types/api';
+```
+
+## Best Practices
+
+### ✅ DO
+- Define types close to their usage
+- Use interfaces for object shapes
+- Use type aliases for unions and primitives
+- Export types explicitly with `export type`
+- Use generic types for reusable patterns
+- Group related types in the same file
+
+### ❌ DON'T
+- Don't use `.d.ts` files unless absolutely necessary
+- Don't create global type pollution
+- Don't over-abstract simple types
+- Don't mix component and global types unnecessarily
+- Don't use `any` type without good reason
+
+### Type Definition Examples
+
+```typescript
+// ✅ DO: Well-structured component types
+interface CardProps {
+  title: string;
+  children: React.ReactNode;
+  variant?: 'default' | 'outlined' | 'elevated';
+  className?: string;
+  onClick?: () => void;
+}
+
+// ✅ DO: API response types
+interface UserApiResponse {
+  user: User;
+  permissions: Permission[];
+  metadata: {
+    lastLogin: Date;
+    loginCount: number;
+  };
+}
+
+// ✅ DO: Generic utility types
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+// ✅ DO: Union types for variants
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
+type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+```
+
+## Migration Strategy
+
+When refactoring existing projects:
+
+1. **Audit existing types** - Identify global vs local usage
+2. **Start with components** - Move component-specific types to colocation
+3. **Group by feature** - Organize remaining types by feature/domain
+4. **Create global types** - Move truly shared types to `src/types/`
+5. **Update imports** - Use barrel exports and selective imports
+6. **Remove unused types** - Clean up orphaned type definitions
+
+## Project-Specific Notes
+
+For this Next.js project:
+- Use `src/types/` for global types
+- Component types should be colocated in component directories
+- API types should be in `src/types/api.ts`
+- Consider feature-based organization as the project grows
+- Use Next.js specific types from `next/types` when appropriate

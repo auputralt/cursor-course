@@ -1,0 +1,253 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository",
+        "description": "Initialize the project repository with NextJS, TailwindCSS, and ShadUI.",
+        "details": "Create a new NextJS project using the App Directory structure. Install TailwindCSS for styling and ShadUI for reusable components. Ensure the project structure supports server components and client-side rendering where necessary.",
+        "testStrategy": "Verify the project builds and runs without errors. Check that TailwindCSS and ShadUI are correctly integrated by creating a simple component.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize NextJS Project",
+            "description": "Create a new NextJS project using the App Directory structure with TypeScript.",
+            "dependencies": [],
+            "details": "Use the NextJS CLI to set up a new project, ensuring the App Directory structure is used and TypeScript is configured.",
+            "status": "done",
+            "testStrategy": "Verify that the project builds and runs without errors using the default NextJS server."
+          },
+          {
+            "id": 2,
+            "title": "Install and Configure TailwindCSS",
+            "description": "Integrate TailwindCSS into the NextJS project for styling.",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "Follow the TailwindCSS installation guide for NextJS, ensuring that the configuration file is set up correctly.",
+            "status": "done",
+            "testStrategy": "Create a sample styled component to verify TailwindCSS is working as expected."
+          },
+          {
+            "id": 3,
+            "title": "Install ShadUI Component Library",
+            "description": "Set up ShadUI for reusable components within the project.",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "Install ShadUI and configure it within the NextJS project, ensuring compatibility with TailwindCSS.",
+            "status": "done",
+            "testStrategy": "Create a simple component using ShadUI to verify its integration."
+          },
+          {
+            "id": 4,
+            "title": "Configure Project Structure",
+            "description": "Ensure the project supports server components and client-side rendering.",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "Adjust the NextJS project structure to support both server components and client-side rendering as per the PRD requirements.",
+            "status": "done",
+            "testStrategy": "Test the project by creating both server and client components to ensure they render correctly."
+          },
+          {
+            "id": 5,
+            "title": "Verify Integration and Functionality",
+            "description": "Ensure all components and libraries are correctly integrated and functional.",
+            "dependencies": [
+              "1.2",
+              "1.3",
+              "1.4"
+            ],
+            "details": "Conduct a comprehensive test to ensure NextJS, TailwindCSS, and ShadUI are working together seamlessly.",
+            "status": "done",
+            "testStrategy": "Run the project and check for any integration issues or errors, ensuring all components render as expected."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Set Up Supabase Local Instance",
+        "description": "Configure a local Supabase instance with initial database schema.",
+        "details": "Install Supabase CLI and initialize a local instance. Create tables for chat sessions and messages using the provided data models. Apply initial SQL migrations to set up the database schema.",
+        "testStrategy": "Run Supabase locally and verify that the database schema matches the specifications. Test database connectivity from the NextJS app.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install Supabase CLI",
+            "description": "Download and install the Supabase CLI on the local development environment.",
+            "dependencies": [],
+            "details": "Visit the official Supabase CLI GitHub repository or website to download the latest version of the CLI. Follow the installation instructions specific to your operating system (Windows, macOS, or Linux). Verify the installation by running 'supabase --version' in the terminal to ensure the CLI is correctly installed.",
+            "status": "done",
+            "testStrategy": "Run 'supabase --version' to confirm the CLI is installed and accessible from the command line."
+          },
+          {
+            "id": 2,
+            "title": "Initialize Supabase Local Instance",
+            "description": "Set up a local Supabase instance using the installed CLI.",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "Use the Supabase CLI to initialize a new project by running 'supabase init' in the desired project directory. This will create the necessary configuration files and directories for a local Supabase instance. Ensure Docker is installed and running, as Supabase uses Docker to manage local instances.",
+            "status": "done",
+            "testStrategy": "Run 'supabase start' to launch the local instance and verify that it starts without errors."
+          },
+          {
+            "id": 3,
+            "title": "Create Initial Database Schema",
+            "description": "Define and create the initial database schema for chat sessions and messages.",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "Using the Supabase SQL editor or a migration file, create tables for chat sessions and messages. Use the provided data models to define the schema, including necessary fields and data types. Ensure that primary keys and any required indexes are set up correctly.",
+            "status": "done",
+            "testStrategy": "Check the database schema using the Supabase dashboard or a database client to ensure tables are created with the correct structure."
+          },
+          {
+            "id": 4,
+            "title": "Apply Initial SQL Migrations",
+            "description": "Apply SQL migrations to set up the database schema as defined in the previous step.",
+            "dependencies": [
+              "2.3"
+            ],
+            "details": "Create a migration file using the Supabase CLI or manually write SQL scripts to apply the initial schema changes. Run the migration using 'supabase db push' or equivalent command to apply the changes to the local database instance.",
+            "status": "done",
+            "testStrategy": "Verify that the migrations have been applied successfully by checking the database schema and ensuring all tables and fields are present."
+          },
+          {
+            "id": 5,
+            "title": "Verify Database Connectivity",
+            "description": "Ensure that the local Supabase instance is accessible and can be connected to from the NextJS application.",
+            "dependencies": [
+              "2.4"
+            ],
+            "details": "Configure the NextJS application to connect to the local Supabase instance using the appropriate connection string and credentials. Test the connection by running a simple query or operation from the NextJS app to the Supabase database.\n<info added on 2025-09-27T04:19:34.525Z>\nVerified database connectivity from the NextJS application by successfully running CRUD operations on the chat_sessions and chat_messages tables. Confirmed that the API endpoint `/api/test-connection` returns success, indicating stable communication between the application and the Supabase database.\n</info added on 2025-09-27T04:19:34.525Z>",
+            "status": "done",
+            "testStrategy": "Run the NextJS application and perform a test query to the Supabase database to confirm connectivity. Check for any connection errors and resolve them as necessary."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Implement Basic UI Layout",
+        "description": "Develop the basic UI layout for the chat interface using React components.",
+        "details": "Create React components for the chat interface, including input areas and message display sections. Use TailwindCSS for styling and ensure the layout is responsive and clean.",
+        "testStrategy": "Render the UI components in a browser and verify layout correctness and responsiveness. Ensure that components are styled as per design specifications.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Integrate OpenAI Text Generation",
+        "description": "Implement text chat functionality using OpenAI's GPT-4.1-nano model with streaming responses.",
+        "details": "Use OpenAI's API to integrate text generation capabilities. Implement streaming responses to display AI-generated text in real-time. Ensure proper API key management and error handling.",
+        "testStrategy": "Test the text chat functionality by sending messages and receiving streaming responses. Validate real-time display and error handling for API rate limits.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Implement Streaming Response Rendering",
+        "description": "Render streaming responses from OpenAI in the chat interface.",
+        "details": "Use React state management to handle incoming tokens from the OpenAI streaming API. Update the UI in real-time as tokens are received to create a seamless user experience.",
+        "testStrategy": "Simulate streaming responses and verify that the UI updates in real-time. Check for smooth transitions and absence of flickering or delays.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Add Image Generation Capability",
+        "description": "Enable image generation using OpenAI's gpt-image-1 model with a mode toggle.",
+        "details": "Implement a UI toggle to switch between text and image generation modes. Use OpenAI's image generation API to process user requests and display generated images.",
+        "testStrategy": "Test the mode toggle functionality and ensure seamless switching between modes. Validate image generation requests and correct display of generated images.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Implement Message Storage in Supabase",
+        "description": "Store chat messages and sessions in Supabase database.",
+        "details": "Use Supabase client libraries to store and retrieve chat messages and sessions. Ensure data is stored according to the defined schema and handle any potential data conflicts.",
+        "testStrategy": "Verify that messages and sessions are correctly stored and retrieved from the database. Test data integrity and consistency across different chat sessions.",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Create New Chat Functionality",
+        "description": "Allow users to start a new chat session, clearing previous history.",
+        "details": "Implement functionality to clear the current chat and start a new session. Store the previous session in Supabase and reset the UI for a fresh start.",
+        "testStrategy": "Test the new chat functionality by starting and ending multiple sessions. Ensure previous sessions are stored and the UI resets correctly.",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Enhance UI with Improved Styling",
+        "description": "Refine the UI with enhanced styling and responsiveness.",
+        "details": "Use TailwindCSS to improve the visual appeal of the chat interface. Ensure the UI is responsive and visually distinct between user and AI messages.",
+        "testStrategy": "Review the UI on different devices and screen sizes to ensure consistent styling and responsiveness. Validate visual distinction between different message types.",
+        "priority": "low",
+        "dependencies": [
+          3,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Optimize API Usage and Error Handling",
+        "description": "Improve API usage efficiency and implement robust error handling.",
+        "details": "Optimize API calls to reduce latency and handle errors gracefully. Implement feedback mechanisms for users in case of API failures or rate limits.",
+        "testStrategy": "Conduct load testing to evaluate API performance. Test error scenarios and ensure appropriate feedback is provided to users.",
+        "priority": "low",
+        "dependencies": [
+          4,
+          5,
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-09-26T13:01:18.437Z",
+      "updated": "2025-09-27T04:19:25.097Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

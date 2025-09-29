@@ -51,7 +51,7 @@ https://github.com/user-attachments/assets/2c2ada4e-c7ed-4176-be20-0afd63ea9b98
 git clone FORKED_REPO_HTTPS_URL
 ```
 
-1. Populate ANTHROPIC_API_KEY and OPENAI_API_KEY.
+1. Populate OPENAI_API_KEY.
 - In the root directory, rename `.env.example` and rename as `.env` 
 
 2. Get your OPENAI_API_KEY

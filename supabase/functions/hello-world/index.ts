@@ -4,12 +4,12 @@
 
 // Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "@supabase/supabase-js";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Content-Type": "application/json",
 };
 
 export function handleCors(req: Request) {
@@ -17,11 +17,6 @@ export function handleCors(req: Request) {
     return new Response("ok", { headers: corsHeaders });
   }
 }
-// How to fetch .env keys
-const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-
-// const supabase = createClient(supabaseUrl, supabaseKey);
 
 console.log("Hello from Functions!");
 
@@ -33,7 +28,16 @@ Deno.serve(async (req) => {
   try {
     // Validate request method
     if (req.method !== "POST") {
-      throw new Error(`Method ${req.method} not allowed`);
+      return new Response(
+        JSON.stringify({
+          error: `Method ${req.method} not allowed`,
+          success: false,
+        }),
+        {
+          status: 405,
+          headers: corsHeaders,
+        }
+      );
     }
 
     // Parse request body
@@ -46,7 +50,10 @@ Deno.serve(async (req) => {
       if (typeof body.name !== "string") {
         throw new Error("Name must be a string");
       }
-      name = body.name;
+      if (body.name.trim() === "") {
+        throw new Error("Name cannot be empty");
+      }
+      name = body.name.trim();
     } catch (err) {
       if (err instanceof SyntaxError) {
         throw new Error("Invalid JSON in request body");
@@ -54,8 +61,14 @@ Deno.serve(async (req) => {
       throw err;
     }
 
-    const data = { message: `Hello ${name}!` };
-    return new Response(JSON.stringify(data), { headers: corsHeaders });
+    const data = { 
+      message: `Hello ${name}!`,
+      success: true 
+    };
+    return new Response(JSON.stringify(data), { 
+      status: 200,
+      headers: corsHeaders 
+    });
   } catch (error) {
     const errorResponse = {
       error:

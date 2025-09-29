@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chat App",
-  description: "A modern chat application built with Next.js, Supabase, and AI",
+  title: "GPT chatbot by Mr. Putra",
+  description: "A modern GPT chatbot application built with Next.js, Supabase, and AI by Mr. Putra",
 };
 
 export default function RootLayout({

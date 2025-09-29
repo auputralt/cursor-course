@@ -7,8 +7,7 @@ A task management system for AI-driven development with Claude, designed to work
 ## Requirements
 
 - Node.js 14.0.0 or higher
-- Anthropic API key (Claude API)
-- Anthropic SDK version 0.39.0 or higher
+- OpenAI API key
 - OpenAI SDK (for Perplexity API integration, optional)
 
 ## Configuration
@@ -17,7 +16,7 @@ The script can be configured through environment variables in a `.env` file at t
 
 ### Required Configuration
 
-- `ANTHROPIC_API_KEY`: Your Anthropic API key for Claude
+- `OPENAI_API_KEY`: Your OpenAI API key
 
 ### Optional Configuration
 
@@ -68,7 +67,7 @@ This will prompt you for project details and set up a new project with the neces
      - Use `await import()` for dynamic imports
    - If you need CommonJS throughout your project, remove `"type": "module"` from package.json, but Task Master scripts expect ESM.
 
-2. The Anthropic SDK version should be 0.39.0 or higher.
+2. The OpenAI SDK should be compatible with the latest version.
 
 ## Quick Start with Global Commands
 
