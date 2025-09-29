@@ -1,14 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
-
-export interface MessageData {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  type: "text" | "image";
-  imageUrl?: string;
-  timestamp: Date;
-}
+import { MessageData } from "@/types/chat";
 
 export function useChat() {
   const [messages, setMessages] = useState<MessageData[]>([]);

@@ -1,15 +1,7 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-
-interface MessageData {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  type: "text" | "image";
-  imageUrl?: string;
-  timestamp: Date;
-}
+import { MessageData } from "@/types/chat";
 
 interface MessageProps {
   message: MessageData;

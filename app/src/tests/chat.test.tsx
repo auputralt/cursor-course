@@ -1,4 +1,6 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { vi } from 'vitest';
 import { ChatLayout } from '@/components/chat/ChatLayout';
 import { MessageList } from '@/components/chat/MessageList';
 import { MessageInput } from '@/components/chat/MessageInput';
@@ -27,10 +29,10 @@ describe('ChatLayout', () => {
     render(
       <ChatLayout
         messages={mockMessages}
-        onSendMessage={jest.fn()}
-        onNewChat={jest.fn()}
+        onSendMessage={vi.fn()}
+        onNewChat={vi.fn()}
         mode="text"
-        onModeChange={jest.fn()}
+        onModeChange={vi.fn()}
         isLoading={false}
       />
     );
@@ -45,15 +47,18 @@ describe('ChatLayout', () => {
     render(
       <ChatLayout
         messages={[]}
-        onSendMessage={jest.fn()}
-        onNewChat={jest.fn()}
+        onSendMessage={vi.fn()}
+        onNewChat={vi.fn()}
         mode="text"
-        onModeChange={jest.fn()}
+        onModeChange={vi.fn()}
         isLoading={true}
       />
     );
 
-    expect(screen.getByText('AI')).toBeInTheDocument();
+    // Check for loading indicator specifically (the one in the message area)
+    const loadingIndicators = screen.getAllByText('AI');
+    expect(loadingIndicators).toHaveLength(2); // Header AI + Loading AI
+    expect(loadingIndicators[1]).toBeInTheDocument(); // The loading indicator
   });
 });
 
@@ -74,7 +79,7 @@ describe('MessageList', () => {
 
 describe('MessageInput', () => {
   it('calls onSendMessage when form is submitted', () => {
-    const mockOnSendMessage = jest.fn();
+    const mockOnSendMessage = vi.fn();
     render(
       <MessageInput
         onSendMessage={mockOnSendMessage}
@@ -95,7 +100,7 @@ describe('MessageInput', () => {
   it('updates placeholder based on mode', () => {
     render(
       <MessageInput
-        onSendMessage={jest.fn()}
+        onSendMessage={vi.fn()}
         mode="image"
         disabled={false}
       />
@@ -107,7 +112,7 @@ describe('MessageInput', () => {
 
 describe('ModeToggle', () => {
   it('calls onModeChange when mode is clicked', () => {
-    const mockOnModeChange = jest.fn();
+    const mockOnModeChange = vi.fn();
     render(
       <ModeToggle
         mode="text"

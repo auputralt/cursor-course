@@ -1,15 +1,7 @@
 "use client";
 import React from "react";
 import { Message } from "./Message";
-
-interface MessageData {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  type: "text" | "image";
-  imageUrl?: string;
-  timestamp: Date;
-}
+import { MessageData } from "@/types/chat";
 
 interface MessageListProps {
   messages: MessageData[];

@@ -2,10 +2,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, Image as ImageIcon } from "lucide-react";
+import { ChatMode } from "@/types/chat";
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
-  mode: "text" | "image";
+  mode: ChatMode;
   disabled: boolean;
 }
 

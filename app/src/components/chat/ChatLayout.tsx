@@ -4,20 +4,14 @@ import { Button } from "@/components/ui/button";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { ModeToggle } from "./ModeToggle";
+import { MessageData, ChatMode } from "@/types/chat";
 
 interface ChatLayoutProps {
-  messages: Array<{
-    id: string;
-    role: "user" | "assistant";
-    content: string;
-    type: "text" | "image";
-    imageUrl?: string;
-    timestamp: Date;
-  }>;
+  messages: MessageData[];
   onSendMessage: (message: string) => void;
   onNewChat: () => void;
-  mode: "text" | "image";
-  onModeChange: (mode: "text" | "image") => void;
+  mode: ChatMode;
+  onModeChange: (mode: ChatMode) => void;
   isLoading: boolean;
   streamingText?: string;
 }

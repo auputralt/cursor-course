@@ -2,10 +2,11 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, Image as ImageIcon } from "lucide-react";
+import { ChatMode } from "@/types/chat";
 
 interface ModeToggleProps {
-  mode: "text" | "image";
-  onModeChange: (mode: "text" | "image") => void;
+  mode: ChatMode;
+  onModeChange: (mode: ChatMode) => void;
 }
 
 export function ModeToggle({ mode, onModeChange }: ModeToggleProps) {
