@@ -33,7 +33,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const completion = await openai.chat.completions.create({
+    // Create streaming completion
+    const stream = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
@@ -47,17 +48,22 @@ export async function POST(request: NextRequest) {
       ],
       max_tokens: 1000,
       temperature: 0.7,
+      stream: true, // Enable streaming
     });
 
-    const response = completion.choices[0]?.message?.content || 'No response generated';
-
-    // Return as streaming response for compatibility with frontend
+    // Create a proper streaming response
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
-      start(controller) {
+      async start(controller) {
         try {
-          // Send the response as a single chunk
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: response })}\n\n`));
+          for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content;
+            if (content) {
+              // Send each token as it arrives
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`));
+            }
+          }
+          // Signal completion
           controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
           controller.close();
         } catch (error) {
@@ -69,9 +75,12 @@ export async function POST(request: NextRequest) {
 
     return new Response(readable, {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
     });
 

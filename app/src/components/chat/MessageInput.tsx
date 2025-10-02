@@ -1,18 +1,29 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Image as ImageIcon } from "lucide-react";
+import { 
+  Send, 
+  Image as ImageIcon, 
+  Upload
+} from "lucide-react";
 import { ChatMode } from "@/types/chat";
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
+  onImageUpload?: (file: File) => void;
   mode: ChatMode;
   disabled: boolean;
-}
+                          }
 
-export function MessageInput({ onSendMessage, mode, disabled }: MessageInputProps) {
+export function MessageInput({ 
+  onSendMessage, 
+  onImageUpload, 
+  mode, 
+  disabled
+}: MessageInputProps) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +46,31 @@ export function MessageInput({ onSendMessage, mode, disabled }: MessageInputProp
     }
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onImageUpload) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+      
+      onImageUpload(file);
+      // Reset the input
+      e.target.value = '';
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
@@ -44,37 +80,43 @@ export function MessageInput({ onSendMessage, mode, disabled }: MessageInputProp
   }, [message]);
 
   const placeholder = mode === "text" 
-    ? "Message ChatGPT..." 
+    ? "Ask anything" 
     : "Describe the image you want to generate...";
 
+
   return (
-    <form onSubmit={handleSubmit} className="flex items-end gap-2">
-      <div className="flex-1 relative">
-        <textarea
-          ref={textareaRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled}
-          className="w-full min-h-[44px] max-h-32 px-4 py-3 pr-12 border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed bg-background text-foreground placeholder:text-muted-foreground"
-          rows={1}
-        />
-        <div className="absolute right-2 bottom-2">
-          {mode === "image" && (
-            <ImageIcon className="w-4 h-4 text-muted-foreground" />
-          )}
+    <div className="relative">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2">
+        <div className="flex-1 relative">
+
+          {/* Input Bar */}
+          <div className="relative flex items-center bg-gray-800 border border-gray-600 rounded-lg focus-within:border-gray-500 transition-colors">
+
+            {/* Text Input */}
+            <textarea
+              ref={textareaRef}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={placeholder}
+              disabled={disabled}
+              className="flex-1 min-h-[44px] max-h-32 px-3 py-3 bg-transparent text-white placeholder:text-gray-400 resize-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              rows={1}
+            />
+
+          </div>
         </div>
-      </div>
+      </form>
       
-      <Button
-        type="submit"
-        disabled={!message.trim() || disabled}
-        size="sm"
-        className="h-11 px-4"
-      >
-        <Send className="w-4 h-4" />
-      </Button>
-    </form>
+      
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+    </div>
   );
 }

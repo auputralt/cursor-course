@@ -24,6 +24,24 @@ const mockMessages = [
   },
 ];
 
+const mockImageMessages = [
+  {
+    id: '1',
+    role: 'user' as const,
+    content: 'Create a cute cat picture',
+    type: 'image' as const,
+    timestamp: new Date('2024-01-01T10:00:00Z'),
+  },
+  {
+    id: '2',
+    role: 'assistant' as const,
+    content: 'Generated image: Create a cute cat picture',
+    type: 'image' as const,
+    imageUrl: 'https://example.com/cat-image.png',
+    timestamp: new Date('2024-01-01T10:00:01Z'),
+  },
+];
+
 describe('ChatLayout', () => {
   it('renders chat interface correctly', () => {
     render(
@@ -74,6 +92,14 @@ describe('MessageList', () => {
     
     expect(screen.getByText('Hello, how are you?')).toBeInTheDocument();
     expect(screen.getByText('I am doing well, thank you for asking!')).toBeInTheDocument();
+  });
+
+  it('renders image messages correctly', () => {
+    render(<MessageList messages={mockImageMessages} isLoading={false} />);
+    
+    expect(screen.getByText('Create a cute cat picture')).toBeInTheDocument();
+    expect(screen.getByText('Generated image: Create a cute cat picture')).toBeInTheDocument();
+    expect(screen.getByAltText('Generated image')).toBeInTheDocument();
   });
 });
 

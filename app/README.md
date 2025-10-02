@@ -1,4 +1,15 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ChatGPT 5 by Mr. Putra
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) that creates an advanced AI chatbot with text and image generation capabilities.
+
+## Features
+
+- **Text Chat**: Conversational AI powered by OpenAI GPT models
+- **Image Generation**: Create images using DALL-E 3 with custom prompts
+- **Mode Selection**: Choose between "Talk Only" or "Create Image" modes
+- **Modern UI**: Dark theme interface inspired by ChatGPT 5 design
+- **Real-time Streaming**: Live text responses with streaming support
+- **Image Modal**: Full-size image viewing with download capabilities
 
 ## Getting Started
 

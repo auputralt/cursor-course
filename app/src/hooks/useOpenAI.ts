@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
-import { MessageData } from "@/types/chat";
+import { MessageData, ChatMode } from "@/types/chat";
 
 export function useOpenAI() {
   const [isLoading, setIsLoading] = useState(false);
@@ -8,6 +8,7 @@ export function useOpenAI() {
 
   const sendMessage = useCallback(async (
     message: string,
+    mode: ChatMode,
     onStreamingChunk: (content: string) => void,
     onComplete: (fullMessage: MessageData) => void,
     onError: (error: string) => void
@@ -18,12 +19,18 @@ export function useOpenAI() {
     setError(null);
 
     try {
-      const response = await fetch('/api/chat', {
+      // Choose the appropriate API endpoint based on mode
+      const endpoint = mode === 'image' ? '/api/image' : '/api/chat';
+      const requestBody = mode === 'image' 
+        ? { prompt: message.trim() }
+        : { message: message.trim() };
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: message.trim() }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -38,63 +45,86 @@ export function useOpenAI() {
         throw new Error(errorMessage);
       }
 
-      if (!response.body) {
-        throw new Error('No response body');
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let fullContent = '';
-
-      // Create the AI message object
-      const aiMessage: MessageData = {
-        id: crypto.randomUUID(),
-        role: 'assistant',
-        content: '',
-        type: 'text',
-        timestamp: new Date(),
-      };
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
+      if (mode === 'image') {
+        // Handle image generation response
+        const data = await response.json();
+        
+        if (data.imageUrl) {
+          console.log('Image generated successfully:', data.imageUrl);
+          const aiMessage: MessageData = {
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content: `Generated image: ${message}`, // Use original user message as prompt
+            type: 'image',
+            imageUrl: data.imageUrl,
+            timestamp: new Date(),
+          };
           
-          if (done) break;
+          onComplete(aiMessage);
+        } else {
+          throw new Error(data.error || 'Failed to generate image');
+        }
+      } else {
+        // Handle text streaming response
+        if (!response.body) {
+          throw new Error('No response body');
+        }
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = '';
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-              
-              if (data === '[DONE]') {
-                // Streaming complete
-                aiMessage.content = fullContent;
-                onComplete(aiMessage);
-                return;
-              }
+        // Create the AI message object
+        const aiMessage: MessageData = {
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: '',
+          type: 'text',
+          timestamp: new Date(),
+        };
 
-              try {
-                const parsed = JSON.parse(data);
-                if (parsed.content) {
-                  fullContent += parsed.content;
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                
+                if (data === '[DONE]') {
+                  // Streaming complete
                   aiMessage.content = fullContent;
-                  onStreamingChunk(parsed.content);
+                  onComplete(aiMessage);
+                  return;
                 }
-              } catch (parseError) {
-                // If we get HTML content instead of JSON, it's likely an error page
-                if (data.includes('<!DOCTYPE') || data.includes('<html')) {
-                  throw new Error('Server returned HTML error page instead of streaming response');
+
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.content) {
+                    console.log('Received streaming chunk:', parsed.content);
+                    fullContent += parsed.content;
+                    aiMessage.content = fullContent;
+                    onStreamingChunk(parsed.content);
+                  }
+                } catch (parseError) {
+                  // If we get HTML content instead of JSON, it's likely an error page
+                  if (data.includes('<!DOCTYPE') || data.includes('<html')) {
+                    throw new Error('Server returned HTML error page instead of streaming response');
+                  }
+                  // Ignore parsing errors for malformed chunks
+                  console.warn('Failed to parse streaming chunk:', parseError);
                 }
-                // Ignore parsing errors for malformed chunks
-                console.warn('Failed to parse streaming chunk:', parseError);
               }
             }
           }
+        } finally {
+          reader.releaseLock();
         }
-      } finally {
-        reader.releaseLock();
       }
 
     } catch (error) {

@@ -12,7 +12,7 @@ export default function ChatDemoPage() {
   const handleSendMessage = useCallback(async (message: string) => {
     if (!message.trim()) return;
 
-    console.log("Sending message:", message);
+    console.log("Sending message:", message, "in mode:", mode);
     
     // Add user message
     const userMessage: MessageData = {
@@ -28,6 +28,7 @@ export default function ChatDemoPage() {
     // Send to OpenAI API with streaming
     await sendMessage(
       message,
+      mode,
       // onStreamingChunk - update the last message with streaming content
       (content: string) => {
         setMessages(prev => {
@@ -44,11 +45,11 @@ export default function ChatDemoPage() {
         setMessages(prev => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-          if (lastMessage && lastMessage.role === 'assistant') {
-            // Update the existing message
+          if (lastMessage && lastMessage.role === 'assistant' && mode === 'text') {
+            // Update the existing message only for text mode streaming
             Object.assign(lastMessage, aiMessage);
           } else {
-            // Add as new message if not found
+            // Add as new message for image mode or if no existing assistant message
             newMessages.push(aiMessage);
           }
           return newMessages;
@@ -80,10 +81,32 @@ export default function ChatDemoPage() {
     clearError();
   }, [clearError]);
 
+  const handleImageUpload = useCallback((file: File) => {
+    // Convert file to data URL for display
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const imageUrl = e.target?.result as string;
+      
+      // Add user message with uploaded image
+      const userMessage: MessageData = {
+        id: crypto.randomUUID(),
+        role: "user",
+        content: `Uploaded image: ${file.name}`,
+        type: "image",
+        imageUrl: imageUrl,
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
   return (
     <ChatLayout
       messages={messages}
       onSendMessage={handleSendMessage}
+      onImageUpload={handleImageUpload}
       onNewChat={handleNewChat}
       mode={mode}
       onModeChange={handleModeChange}
