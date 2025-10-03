@@ -1,0 +1,268 @@
+---
+description: Generate and update frontend security checklist based on Security Best Practices
+globs: app/src/**/*.{ts,tsx,js,jsx}, app/next.config.ts, app/middleware.ts, app/src/lib/**/*.ts
+alwaysApply: true
+---
+
+# Frontend Security Checklist Generator
+
+## Purpose
+This rule automatically generates and maintains a comprehensive frontend security checklist based on the Security Best Practices document, specifically tailored for the GPT-powered chatbot application.
+
+## When to Use
+- Before implementing new frontend features
+- During code reviews
+- When adding new API integrations
+- After security-related changes
+- As part of regular security audits
+
+## Security Checklist Generation
+
+### **HTTPS Implementation**
+- [ ] Verify all API calls use HTTPS endpoints
+- [ ] Check for mixed content warnings in browser console
+- [ ] Ensure HSTS headers are properly configured
+- [ ] Validate SSL certificate configuration in production
+
+### **Input Validation & XSS Prevention**
+- [ ] All user inputs are validated on the frontend
+- [ ] Dynamic content rendering uses proper sanitization
+- [ ] Form inputs have appropriate validation rules
+- [ ] URL parameters are validated before use
+- [ ] No direct innerHTML usage with user data
+
+### **Client-Side Data Storage Security**
+- [ ] No sensitive data stored in localStorage/sessionStorage
+- [ ] No API keys or credentials in frontend code
+- [ ] User PII not stored client-side
+- [ ] Authentication tokens stored securely (httpOnly cookies preferred)
+- [ ] No hardcoded secrets in JavaScript files
+
+### **CSRF Protection**
+- [ ] Anti-CSRF tokens implemented for state-changing requests
+- [ ] POST/PUT/DELETE requests include CSRF tokens
+- [ ] Token validation happens on server side
+- [ ] SameSite cookie attributes properly configured
+
+### **API Security**
+- [ ] No API keys exposed in frontend code
+- [ ] API calls go through backend endpoints (no direct frontend-to-OpenAI calls)
+- [ ] CORS configuration is restrictive and secure
+- [ ] Rate limiting implemented on API endpoints
+- [ ] Authentication required for protected endpoints
+
+### **Authentication & Authorization**
+- [ ] User authentication state properly managed
+- [ ] Protected routes require authentication
+- [ ] Session management is secure
+- [ ] Logout functionality clears all client-side data
+- [ ] No privilege escalation vulnerabilities
+
+### **Error Handling Security**
+- [ ] Error messages don't expose sensitive information
+- [ ] No stack traces shown to users in production
+- [ ] Console logging doesn't include sensitive data
+- [ ] Generic error messages for security-related failures
+
+### **Cookie Security**
+- [ ] All cookies have HttpOnly flag where appropriate
+- [ ] Secure flag set for cookies in production
+- [ ] SameSite attribute configured correctly
+- [ ] Appropriate expiration times for session cookies
+
+### **Content Security Policy**
+- [ ] CSP headers implemented and configured
+- [ ] No inline scripts without proper nonces
+- [ ] External script sources are whitelisted
+- [ ] No eval() or similar dangerous functions
+
+### **Dependency Security**
+- [ ] All npm packages are up to date
+- [ ] No known vulnerabilities in dependencies
+- [ ] Regular security audits of package.json
+- [ ] Minimal dependency footprint
+
+## Implementation Commands
+
+### Generate Security Checklist
+```bash
+# Create the logs directory if it doesn't exist
+mkdir -p /Users/shawnesquivel/cursor-course/logs
+
+# Generate the security checklist
+cat > /Users/shawnesquivel/cursor-course/logs/frontend_security_checklist.txt << 'EOF'
+# Frontend Security Checklist - GPT Chatbot Application
+# Generated: $(date)
+# Based on Security Best Practices document
+
+## HTTPS Implementation
+- [ ] Verify all API calls use HTTPS endpoints
+- [ ] Check for mixed content warnings in browser console
+- [ ] Ensure HSTS headers are properly configured
+- [ ] Validate SSL certificate configuration in production
+
+## Input Validation & XSS Prevention
+- [ ] All user inputs are validated on the frontend
+- [ ] Dynamic content rendering uses proper sanitization
+- [ ] Form inputs have appropriate validation rules
+- [ ] URL parameters are validated before use
+- [ ] No direct innerHTML usage with user data
+
+## Client-Side Data Storage Security
+- [ ] No sensitive data stored in localStorage/sessionStorage
+- [ ] No API keys or credentials in frontend code
+- [ ] User PII not stored client-side
+- [ ] Authentication tokens stored securely (httpOnly cookies preferred)
+- [ ] No hardcoded secrets in JavaScript files
+
+## CSRF Protection
+- [ ] Anti-CSRF tokens implemented for state-changing requests
+- [ ] POST/PUT/DELETE requests include CSRF tokens
+- [ ] Token validation happens on server side
+- [ ] SameSite cookie attributes properly configured
+
+## API Security
+- [ ] No API keys exposed in frontend code
+- [ ] API calls go through backend endpoints (no direct frontend-to-OpenAI calls)
+- [ ] CORS configuration is restrictive and secure
+- [ ] Rate limiting implemented on API endpoints
+- [ ] Authentication required for protected endpoints
+
+## Authentication & Authorization
+- [ ] User authentication state properly managed
+- [ ] Protected routes require authentication
+- [ ] Session management is secure
+- [ ] Logout functionality clears all client-side data
+- [ ] No privilege escalation vulnerabilities
+
+## Error Handling Security
+- [ ] Error messages don't expose sensitive information
+- [ ] No stack traces shown to users in production
+- [ ] Console logging doesn't include sensitive data
+- [ ] Generic error messages for security-related failures
+
+## Cookie Security
+- [ ] All cookies have HttpOnly flag where appropriate
+- [ ] Secure flag set for cookies in production
+- [ ] SameSite attribute configured correctly
+- [ ] Appropriate expiration times for session cookies
+
+## Content Security Policy
+- [ ] CSP headers implemented and configured
+- [ ] No inline scripts without proper nonces
+- [ ] External script sources are whitelisted
+- [ ] No eval() or similar dangerous functions
+
+## Dependency Security
+- [ ] All npm packages are up to date
+- [ ] No known vulnerabilities in dependencies
+- [ ] Regular security audits of package.json
+- [ ] Minimal dependency footprint
+
+## Application-Specific Security (GPT Chatbot)
+- [ ] OpenAI API calls properly proxied through backend
+- [ ] Chat message content properly sanitized before display
+- [ ] Image generation requests validated and secured
+- [ ] User session data not exposed in client-side state
+- [ ] Streaming responses don't leak sensitive information
+- [ ] File uploads (if any) properly validated
+- [ ] Rate limiting on chat and image generation endpoints
+
+## Security Headers Checklist
+- [ ] X-Frame-Options: DENY or SAMEORIGIN
+- [ ] X-Content-Type-Options: nosniff
+- [ ] X-XSS-Protection: 1; mode=block
+- [ ] Referrer-Policy: strict-origin-when-cross-origin
+- [ ] Content-Security-Policy: properly configured
+- [ ] Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+## Regular Security Maintenance
+- [ ] Monthly dependency updates
+- [ ] Quarterly security audit
+- [ ] Annual penetration testing
+- [ ] Regular code review for security issues
+- [ ] Monitor security advisories for used libraries
+
+EOF
+```
+
+### Update Security Checklist
+```bash
+# Update the timestamp and regenerate
+sed -i '' "s/Generated: .*/Generated: $(date)/" /Users/shawnesquivel/cursor-course/logs/frontend_security_checklist.txt
+```
+
+## Code Analysis Patterns
+
+### **Look for These Security Anti-Patterns:**
+```typescript
+// ❌ DON'T: Expose API keys
+const OPENAI_API_KEY = "sk-..."; // Never hardcode
+
+// ❌ DON'T: Store sensitive data client-side
+localStorage.setItem('user_password', password);
+
+// ❌ DON'T: Use innerHTML with user data
+element.innerHTML = userInput; // XSS risk
+
+// ❌ DON'T: Skip input validation
+const userData = req.body; // Validate first!
+
+// ❌ DON'T: Expose detailed errors
+throw new Error(`Database error: ${dbError.details}`);
+```
+
+### **Look for These Security Best Practices:**
+```typescript
+// ✅ DO: Use environment variables
+const apiKey = process.env.OPENAI_API_KEY;
+
+// ✅ DO: Validate all inputs
+const validatedInput = z.string().min(1).max(1000).parse(userInput);
+
+// ✅ DO: Sanitize content
+const sanitizedContent = DOMPurify.sanitize(userContent);
+
+// ✅ DO: Use secure cookies
+res.cookie('session', token, { 
+  httpOnly: true, 
+  secure: true, 
+  sameSite: 'strict' 
+});
+
+// ✅ DO: Generic error messages
+throw new Error('Authentication failed');
+```
+
+## Integration with Development Workflow
+
+### **Pre-commit Checks:**
+- Run security checklist before committing
+- Verify no sensitive data in staged files
+- Check for hardcoded credentials
+
+### **Code Review Process:**
+- Review security checklist items
+- Verify input validation
+- Check for proper error handling
+- Ensure no client-side secrets
+
+### **Deployment Checklist:**
+- All security headers configured
+- HTTPS enforced
+- Environment variables properly set
+- No debug information exposed
+
+## Monitoring and Maintenance
+
+### **Regular Tasks:**
+- Weekly: Check for dependency updates
+- Monthly: Review security checklist
+- Quarterly: Full security audit
+- Annually: Penetration testing
+
+### **Automated Checks:**
+- Use tools like `npm audit` for dependency vulnerabilities
+- Implement CI/CD security scanning
+- Monitor for security advisories
+- Set up alerts for failed security checks

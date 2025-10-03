@@ -3,11 +3,17 @@ import React, { useState, useCallback } from "react";
 import { ChatLayout } from "@/components/chat/ChatLayout";
 import { MessageData, ChatMode } from "@/types/chat";
 import { useOpenAI } from "@/hooks/useOpenAI";
+import { useAuth } from "@/hooks/useAuth";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { UserMenu } from "@/components/auth/UserMenu";
+import { Button } from "@/components/ui/button";
 
 export default function ChatDemoPage() {
   const [messages, setMessages] = useState<MessageData[]>([]);
   const [mode, setMode] = useState<ChatMode>("text");
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { isLoading, error, sendMessage, clearError } = useOpenAI();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
 
   const handleSendMessage = useCallback(async (message: string) => {
     if (!message.trim()) return;
@@ -102,15 +108,78 @@ export default function ChatDemoPage() {
     reader.readAsDataURL(file);
   }, []);
 
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication required message if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Welcome to AI Chat
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Please sign in to start chatting with our AI assistant.
+          </p>
+          <div className="space-y-3">
+            <Button
+              onClick={() => setShowAuthModal(true)}
+              className="w-full"
+            >
+              Sign In
+            </Button>
+            <Button
+              onClick={() => setShowAuthModal(true)}
+              variant="outline"
+              className="w-full"
+            >
+              Create Account
+            </Button>
+          </div>
+        </div>
+        
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+        />
+      </div>
+    );
+  }
+
   return (
-    <ChatLayout
-      messages={messages}
-      onSendMessage={handleSendMessage}
-      onImageUpload={handleImageUpload}
-      onNewChat={handleNewChat}
-      mode={mode}
-      onModeChange={handleModeChange}
-      isLoading={isLoading}
-    />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with user menu */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <h1 className="text-xl font-semibold text-gray-900">
+              AI Chat Assistant
+            </h1>
+            <UserMenu />
+          </div>
+        </div>
+      </header>
+
+      {/* Main chat interface */}
+      <ChatLayout
+        messages={messages}
+        onSendMessage={handleSendMessage}
+        onImageUpload={handleImageUpload}
+        onNewChat={handleNewChat}
+        mode={mode}
+        onModeChange={handleModeChange}
+        isLoading={isLoading}
+      />
+    </div>
   );
 }

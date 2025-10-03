@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if Supabase is configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json({
+        message: "Supabase not configured - skipping database tests",
+        timestamp: new Date().toISOString(),
+        database: {
+          configured: false,
+          message: "Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY environment variables"
+        }
+      });
+    }
+
+    // Import supabase only if configured
+    const { supabase } = await import("@/lib/supabase");
+    
     // Test Supabase database connectivity
     const { data: sessions, error: sessionsError } = await supabase
       .from('chat_sessions')

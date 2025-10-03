@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+import DOMPurify from 'dompurify';
 import { MessageData } from "@/types/chat";
 import { ImageModal } from "./ImageModal";
 
@@ -43,7 +44,7 @@ export function Message({ message }: MessageProps) {
               <div className="relative w-full max-w-md">
                 {/* Clickable image */}
                 <img
-                  src={message.imageUrl}
+                  src={DOMPurify.sanitize(message.imageUrl)}
                   alt={message.role === "user" ? "Uploaded image" : "Generated image"}
                   className="rounded-lg w-full h-auto max-w-md cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={handleImageClick}
@@ -61,7 +62,15 @@ export function Message({ message }: MessageProps) {
               </div>
             </div>
           ) : (
-            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+            <p 
+              className="text-sm whitespace-pre-wrap"
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(message.content, { 
+                  ALLOWED_TAGS: ['br', 'p', 'strong', 'em', 'u', 'code', 'pre'],
+                  ALLOWED_ATTR: []
+                })
+              }}
+            />
           )}
         </div>
         
